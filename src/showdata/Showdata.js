@@ -10,9 +10,11 @@ export default class Showdata extends Component{
         super();
         this.state ={
             list:[],
+            timestamp:"",
             idkey:"",
             firstname:"",
-            lastname:""
+            lastname:"",
+            email:localStorage.getItem("user").email,
         }
         this.handleChang = this.handleChang.bind(this);
         this.handleClicked = this.handleClicked.bind(this);
@@ -34,7 +36,11 @@ export default class Showdata extends Component{
     onDelete=(user)=>{
         let url = `https://localhost:3000/delete`;
         let data = {
-            idkey:user.id
+            timestamp:user.timestamp,
+            idkey:user.id,
+            firstname:user.firstname,
+            lastname:user.lastname,
+            email:user.email,
         }
         axios.put(url,data)
         setTimeout(()=>{this.componentDidMount()},1)
@@ -54,9 +60,14 @@ export default class Showdata extends Component{
     call=(user)=>{
         this.openModal();
         this.setState({
+            timestamp:user.timestamp,
             idkey:user.id,
             firstname:user.firstname,
-            lastname:user.lastname
+            lastname:user.lastname,
+            email:user.email,
+
+            
+            
         })
     }
     handleChang = (e) => {
@@ -65,9 +76,11 @@ export default class Showdata extends Component{
         });
         let url = `https://localhost:3000/data`;
         let data = {
+            timestamp:this.state.timestamp,
             idkey:this.state.idkey,
             firstname:this.state.firstname,
-            lastname:this.state.lastname
+            lastname:this.state.lastname,
+            email:JSON.parse(localStorage.getItem('user')).email,
         }
         axios.put(url,data)
     }
@@ -75,15 +88,20 @@ export default class Showdata extends Component{
     handleClicked(){
         let url = `https://localhost:3000/data`;
         let data = {
+            timestamp:this.state.timestamp,
             idkey:this.state.idkey,
             firstname:this.state.firstname,
-            lastname:this.state.lastname
+            lastname:this.state.lastname,
+            email:this.state.email,
         }
         axios.put(url,data)
         this.setState({
+            timestamp:"",
             idkey:"",
             firstname:"",
-            lastname:""
+            lastname:"",
+            email:""
+         
         });
 	this.closeModal();
         setTimeout(()=>{this.componentDidMount()},1)
@@ -99,20 +117,24 @@ export default class Showdata extends Component{
                     <table className="table table-dark">
                         <thead>
                             <tr>
+                            <th>Date-Time</th>
                             <th>ID</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>Firstname</th>
+                            <th>lastname</th>
+                            <th>email</th>
                             </tr>
                         </thead>
                         <tbody>
                                 {list.map((user) =>{
                                     return(
                                         <tr>
+                                            <td>{user.timestamp}</td>
                                             <td>{user.id}</td>
                                             <td>{user.firstname}</td>
                                             <td>{user.lastname}</td>
+                                            <td>{user.email}</td>
                                             <td><button type="button" class="btn btn-warning" onClick={()=>this.call(user)}>Edit</button></td>
-                                            <td><button type="button" class="btn btn-danger"  onClick={()=>this.onDelete(user)}>Delet</button></td>
+                                            <td><button type="button" class="btn btn-danger"  onClick={()=>this.onDelete(user)}>Delete</button></td>
                                             <div className="box">
                                                 <Modal visible={this.state.visible}
                                                        width="1200"
@@ -121,15 +143,19 @@ export default class Showdata extends Component{
                                                        onClickAway={() => this.closeModal()}
                                                 >
                                                     <form className="container" id='form'>
+                                                         <div className="form-group">
+                                                            <label>timestamp:</label>
+                                                            <input type="text" className="form-control" id="timestamp" onChange={this.handleChang} value={this.state.timestamp}/>
+                                                        </div>
                                                         <div className="form-group">
                                                             <h3><label htmlFor="id">ID: {this.state.idkey}<br/></label></h3>
                                                         </div>
                                                         <div className="form-group">
-                                                            <label>firstname:</label>
+                                                            <label>FirstName:</label>
                                                             <input type="text" className="form-control" id="firstname" onChange={this.handleChang} value={this.state.firstname}/>
                                                         </div>
                                                         <div className="form-group">
-                                                            <label>lasttname:</label>
+                                                            <label>lastName:</label>
                                                             <input type="text" className="form-control" id="lastname" onChange={this.handleChang} value={this.state.lastname}/>
                                                         </div>
                                                         <button type="button" className="btn btn-primary" onClick={this.handleClicked}>Submit</button>
